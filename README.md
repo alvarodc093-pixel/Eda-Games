@@ -15,7 +15,7 @@ A través de un Análisis Exploratorio de Datos (EDA), se estudian aspectos clav
 
 El proyecto está orientado a la construcción de un dashboard interactivo en Streamlit y a la presentación de insights de negocio mediante técnicas de storytelling.
 
-App desplegada: https://share.streamlit.io/
+App desplegada: https://eda-games-apdqgafan5itappced9lpes.streamlit.app/
 
 ---
 

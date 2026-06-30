@@ -83,10 +83,10 @@ st.sidebar.markdown("---")
 
 # Mapeo seguro de secciones internas
 SECCIONES_MAP = {
-    "📊 Dashboard General": "dashboard",
-    "🔍 Buscador & Catálogo por Publisher": "search_and_catalog",
-    "🏆 Títulos Líderes en el Mercado": "market_leaders",
-    "📄 Documentación Técnica": "docs"
+    "Dashboard General": "dashboard",
+    "Buscador & Catálogo por Publisher": "search_and_catalog",
+    "Títulos Líderes en el Mercado": "market_leaders",
+    "Documentación Técnica": "docs"
 }
 
 seccion_seleccionada = st.sidebar.radio(
@@ -120,35 +120,35 @@ if app_mode == "dashboard":
     st.markdown("---")
     
     tabs = st.tabs([
-        "🏛️ Introducción & Auditoría", 
-        "📊 Volumen vs Realidad Económica", 
-        "🏢 Concentración de Mercados", 
-        "🌍 Crítica Regresiva & Geografía", 
-        "📅 Ventanas Estratégicas (Timing)"
+        "Introducción & Auditoría", 
+        "Volumen vs Realidad Económica", 
+        "Concentración de Mercados", 
+        "Crítica Regresiva & Geografía", 
+        "Ventanas Estratégicas (Timing)"
     ])
     
     # TAB 1: INTRODUCCIÓN Y AUDITORÍA
     with tabs[0]:
-        st.markdown("## 🎯 Contexto de Negocio y Calidad de la Información")
+        st.markdown("## Contexto de Negocio y Calidad de la Información")
         kpi_a, kpi_b, kpi_c = st.columns(3)
         with kpi_a:
-            st.metric(label="📊 Universo de Datos Crudos Analizados", value=f"{df_raw_len:,}", delta="Dataset Global Completo")
+            st.metric(label="Universo de Datos Crudos Analizados", value=f"{df_raw_len:,}", delta="Dataset Global Completo")
         with kpi_b:
-            st.metric(label="💎 Registros Depurados Activos", value=f"{len(df):,}", delta="Con Tracción Comercial (>0)", delta_color="normal")
+            st.metric(label="Registros Depurados Activos", value=f"{len(df):,}", delta="Con Tracción Comercial (>0)", delta_color="normal")
         with kpi_c:
             tasa_limpieza = ((df_raw_len - len(df)) / df_raw_len) * 100
-            st.metric(label="🧼 Calidad del Pipeline de Datos", value=f"{100 - tasa_limpieza:.1f}% Reliable", delta=f"{df_raw_len - len(df):,} Inconsistencias Removidas", delta_color="inverse")
+            st.metric(label="Calidad del Pipeline de Datos", value=f"{100 - tasa_limpieza:.1f}% Reliable", delta=f"{df_raw_len - len(df):,} Inconsistencias Removidas", delta_color="inverse")
             
         st.markdown("---")
         col_izq, col_der = st.columns([5, 4])
         with col_izq:
             st.markdown("""
-            ### 🚨 La Problemática Comercial: Asimetría y Riesgo AAA
+            ###La Problemática Comercial: Asimetría y Riesgo AAA
             El ecosistema de los videojuegos genera miles de millones de dólares anuales, pero se rige bajo una estricta distribución de **larga cola (Power Law)**. Lanzar un nuevo título al mercado implica inversiones de desarrollo que superan con frecuencia los **100 millones de USD**, acompañadas de ciclos de producción de hasta 7 años.
             
             Un error en la fecha elegida, ignorar las preferencias culturales de una región geográfica específica o seleccionar un género saturado puede comprometer permanentemente el retorno de inversión y llevar a un estudio a la quiebra.
             
-            ### 🗺️ Objetivos del Framework Analítico
+            ### Objetivos del Framework Analítico
             Este panel interactivo da respuesta sistemática a las preguntas comerciales indispensables para directores de producto y editores:
             """)
             st.info("""
@@ -159,15 +159,15 @@ if app_mode == "dashboard":
             * **5. Estacionalidad Táctica:** Descubrimiento del momento exacto del año para lanzar según la eficiencia por título.
             """)
         with col_der:
-            st.markdown("### 🛠️ Ficha Técnica del Pipeline de Ingeniería de Datos")
-            with st.expander("🔍 Ver Procesamiento y Saneamiento ETL", expanded=True):
+            st.markdown("### Ficha Técnica del Pipeline de Ingeniería de Datos")
+            with st.expander("Ver Procesamiento y Saneamiento ETL", expanded=True):
                 st.markdown("""
                 * **Filtrado Anti-Sesgo:** Eliminación de registros con facturación en cero o nula para proteger las medias financieras de distorsiones por software gratuito o descatalogado.
                 * **Tratamiento de Datos Ausentes:** Los campos nulos en variables cualitativas críticas como *Género* o *Plataforma* se rellenaron con la categoría controlada `Unknown` para conservar el volumen poblacional real.
                 * **Resolución Temporal Eficiente:** Reconstrucción de la dimensión temporal extrayendo el año nativo directo del objeto de marca de tiempo (`release_date`) cuando la columna analítica presentaba nulos.
                 * **Estandarización Semántica:** Mapeo automatizado mediante coincidencia léxica para unificar variaciones de nombres de columnas presentes en entornos heterogéneos de extracción.
                 """)
-            st.success("✅ **Estado:** Datos consolidados, auditados y listos para la toma de decisiones analíticas.")
+            st.success("**Estado:** Datos consolidados, auditados y listos para la toma de decisiones analíticas.")
 
     # TAB 2: VOLUMEN
     with tabs[1]:
@@ -322,7 +322,7 @@ elif app_mode == "search_and_catalog":
     st.subheader("Auditoría individual y análisis de carteras corporativas")
     st.markdown("---")
     
-    st.markdown("### 🎛️ Filtros de Segmentación de Catálogo")
+    st.markdown("### Filtros de Segmentación de Catálogo")
     col_filtro_izq, col_filtro_der = st.columns(2)
     
     with col_filtro_izq:
@@ -356,21 +356,21 @@ elif app_mode == "search_and_catalog":
                 with col_metrics:
                     st.markdown(f"## {juego_data[title_col]}")
                     c1, c2, c3 = st.columns(3)
-                    c1.metric("🎮 Plataforma", str(juego_data[console_col]).upper())
-                    c2.metric("🏢 Publisher / Editor", str(juego_data[publisher_col]))
-                    c3.metric("🛠️ Desarrollador / Estudio", str(juego_data['developer']) if ('developer' in juego_data and pd.notna(juego_data['developer'])) else "No Disponible")
+                    c1.metric(" Plataforma", str(juego_data[console_col]).upper())
+                    c2.metric(" Publisher / Editor", str(juego_data[publisher_col]))
+                    c3.metric(" Desarrollador / Estudio", str(juego_data['developer']) if ('developer' in juego_data and pd.notna(juego_data['developer'])) else "No Disponible")
                     c4, c5, c6 = st.columns(3)
-                    c4.metric("🎭 Género Comercial", str(juego_data['genre']))
-                    c5.metric("📅 Año de Estreno", f"{int(juego_data['year'])}")
-                    c6.metric("📈 Facturación Global", f"{juego_data[sales_col]:.2f} M USD")
+                    c4.metric(" Género Comercial", str(juego_data['genre']))
+                    c5.metric(" Año de Estreno", f"{int(juego_data['year'])}")
+                    c6.metric(" Facturación Global", f"{juego_data[sales_col]:.2f} M USD")
                     with st.expander("🌍 Distribución de Ventas por Mercado Geográfico"):
                         r1, r2, r3, r4 = st.columns(4)
                         r1.metric("🇺🇸 Norteamérica (NA)", f"{juego_data['na_sales']:.2f} M" if 'na_sales' in juego_data else "N/D")
                         r2.metric("🇪🇺 Europa / PAL", f"{juego_data['pal_sales']:.2f} M" if 'pal_sales' in juego_data else "N/D")
                         r3.metric("🇯🇵 Japón (JP)", f"{juego_data['jp_sales']:.2f} M" if 'jp_sales' in juego_data else "N/D")
-                        r4.metric("🌐 Otros Mercados", f"{juego_data['other_sales']:.2f} M" if 'other_sales' in juego_data else "N/D")
+                        r4.metric(" Otros Mercados", f"{juego_data['other_sales']:.2f} M" if 'other_sales' in juego_data else "N/D")
         else:
-            st.warning("⚠️ No hay títulos que coincidan con los criterios de filtrado.")
+            st.warning(" No hay títulos que coincidan con los criterios de filtrado.")
             
     with tab_publisher:
         st.markdown("### Cartera de Productos por Compañía Editora")
@@ -380,9 +380,9 @@ elif app_mode == "search_and_catalog":
             df_pub = df_filtered[df_filtered[publisher_col] == pub_seleccionado].sort_values(by=sales_col, ascending=False)
             if not df_pub.empty:
                 kpi1, kpi2, kpi3 = st.columns(3)
-                kpi1.metric("📦 Títulos que cumplen el filtro", f"{len(df_pub)}")
-                kpi2.metric("💰 Facturación en este segmento", f"${df_pub[sales_col].sum():.2f}M USD")
-                kpi3.metric("🔝 Líder del Filtro", f"{df_pub.iloc[0][title_col]}")
+                kpi1.metric(" Títulos que cumplen el filtro", f"{len(df_pub)}")
+                kpi2.metric(" Facturación en este segmento", f"${df_pub[sales_col].sum():.2f}M USD")
+                kpi3.metric(" Líder del Filtro", f"{df_pub.iloc[0][title_col]}")
                 st.markdown("---")
                 max_mostrar = st.slider("Cantidad máxima de títulos a renderizar:", min_value=4, max_value=40, value=12, step=4, key="slider_pub_games")
                 grid_cols = st.columns(4)
@@ -399,7 +399,7 @@ elif app_mode == "search_and_catalog":
                         st.markdown(f"📈 Total: **{row[sales_col]:.2f} M USD**")
                         st.markdown("---")
         else:
-            st.warning("⚠️ No hay datos de Publishers disponibles.")
+            st.warning(" No hay datos de Publishers disponibles.")
 
     with tab_plataforma:
         st.markdown("### Búsqueda y Exploración de Títulos por Consola")
@@ -427,7 +427,7 @@ elif app_mode == "search_and_catalog":
                         st.markdown(f"📈 Total: **{row[sales_col]:.2f} M USD**")
                         st.markdown("---")
         else:
-            st.warning("⚠️ No hay datos de Plataformas disponibles.")
+            st.warning(" No hay datos de Plataformas disponibles.")
 
 # ------------------------------------------------------------------------------
 # MODO C: SECCIÓN PROPIA DE TÍTULOS LÍDERES EN EL MERCADO (Histórico Global)
@@ -452,8 +452,8 @@ elif app_mode == "market_leaders":
                     try: st.image(url_final, use_container_width=True)
                     except Exception: st.image("https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=200", use_container_width=True)
                     st.markdown(f"**{row[title_col]}**")
-                    st.caption(f"🕹️ `{str(row[console_col]).upper()}` | 🎭 `{row['genre']}` | 📅 {int(row['year'])}")
-                    st.markdown(f"📈 Facturación: **{row[sales_col]:.2f} M**")
+                    st.caption(f" `{str(row[console_col]).upper()}` |  `{row['genre']}` |  {int(row['year'])}")
+                    st.markdown(f" Facturación: **{row[sales_col]:.2f} M**")
             st.markdown("---")
 
 # ------------------------------------------------------------------------------

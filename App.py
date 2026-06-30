@@ -107,7 +107,7 @@ st.sidebar.info(
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# MODO A: DASHBOARD GENERAL (Primera Impresión Optimizada con tu gráfico integrado)
+# MODO A: DASHBOARD GENERAL 
 # ------------------------------------------------------------------------------
 if app_mode == "dashboard":
     df_filtered = df.copy() # El dashboard opera sobre el histórico global completo
@@ -120,14 +120,14 @@ if app_mode == "dashboard":
     st.markdown("---")
     
     tabs = st.tabs([
-        "Introducción & Auditoría", 
+        "Introducción", 
         "Volumen vs Realidad Económica", 
         "Concentración de Mercados", 
         "Crítica Regresiva & Geografía", 
         "Ventanas Estratégicas (Timing)"
     ])
     
-    # TAB 1: INTRODUCCIÓN Y AUDITORÍA
+    # TAB 1: INTRODUCCIÓN 
     with tabs[0]:
         st.markdown("## Contexto de Negocio y Calidad de la Información")
         kpi_a, kpi_b, kpi_c = st.columns(3)
@@ -143,7 +143,7 @@ if app_mode == "dashboard":
         col_izq, col_der = st.columns([5, 4])
         with col_izq:
             st.markdown("""
-            ###La Problemática Comercial: Asimetría y Riesgo AAA
+            ### La Problemática Comercial: Asimetría y Riesgo AAA
             El ecosistema de los videojuegos genera miles de millones de dólares anuales, pero se rige bajo una estricta distribución de **larga cola (Power Law)**. Lanzar un nuevo título al mercado implica inversiones de desarrollo que superan con frecuencia los **100 millones de USD**, acompañadas de ciclos de producción de hasta 7 años.
             
             Un error en la fecha elegida, ignorar las preferencias culturales de una región geográfica específica o seleccionar un género saturado puede comprometer permanentemente el retorno de inversión y llevar a un estudio a la quiebra.
@@ -172,7 +172,7 @@ if app_mode == "dashboard":
     # TAB 2: VOLUMEN
     with tabs[1]:
         st.header("Distribución del Mercado: Volumen de Producción vs Éxito Real")
-        col1, col2 = st.columns(2)
+        col1, col2, = st.columns(2)
         with col1:
             st.subheader("Volumen de Títulos por Género")
             fig1, ax1 = plt.subplots(figsize=(10, 5))
@@ -191,47 +191,149 @@ if app_mode == "dashboard":
     # TAB 3: CONCENTRACIÓN
     with tabs[2]:
         st.header("Concentración de Ingresos: ¿Quién se queda con el Pastel?")
-        col1, col2 = st.columns(2)
-        with col1:
+        
+        # --- FILA 1: Consolas y Géneros (2 columnas) ---
+        fila1_col1, fila1_col2 = st.columns(2)
+        
+        with fila1_col1:
             st.subheader("Top 10 Consolas por Volumen de Facturación")
             if not df_filtered.empty:
                 top_consoles = df_filtered.groupby("console")["total_sales"].sum().sort_values(ascending=False).head(10).reset_index()
-                fig3, ax3 = plt.subplots(figsize=(10, 5))
+                fig3, ax3 = plt.subplots(figsize=(10, 5.5))  # Un poco más de altura para legibilidad
                 sns.barplot(data=top_consoles, x="total_sales", y="console", palette="Blues_r", hue="console", legend=False, ax=ax3)
+                ax3.set_xlabel("Ventas Globales (M USD)", fontsize=9)
+                ax3.set_ylabel("Consola", fontsize=9)
                 st.pyplot(fig3)
-        with col2:
+                
+        with fila1_col2:
             st.subheader("Rendimiento Económico Acumulado por Género")
             if not df_filtered.empty:
                 ventas_genero = df_filtered.groupby("genre")["total_sales"].sum().sort_values(ascending=False).reset_index()
-                fig4, ax4 = plt.subplots(figsize=(10, 5))
+                fig4, ax4 = plt.subplots(figsize=(10, 5.5))
                 sns.barplot(data=ventas_genero, x="total_sales", y="genre", palette="viridis", hue="genre", legend=False, ax=ax4)
+                ax4.set_xlabel("Ventas Globales (M USD)", fontsize=9)
+                ax4.set_ylabel("Género", fontsize=9)
                 st.pyplot(fig4)
+        
+        st.markdown("---") # Línea divisoria visual
+        
+        # --- FILA 2: Heatmap y Distribución Regional (2 columnas) ---
+        fila2_col1, fila2_col2 = st.columns(2)
+        
+        with fila2_col1:
+            st.subheader("Matriz Estratégica: Top 10 Publishers")
+            if not df_filtered.empty:
+                top_10_publishers = df_filtered.groupby(publisher_col)["total_sales"].sum().nlargest(10).index
+                df_top_pub = df_filtered[df_filtered[publisher_col].isin(top_10_publishers)]
 
-    # TAB 4: CRÍTICA Y GEOGRAFÍA
+                if not df_top_pub.empty:
+                    matriz_pub_genre = df_top_pub.pivot_table(index=publisher_col, columns="genre", values="total_sales", aggfunc="sum").fillna(0)
+                    matriz_pub_genre = matriz_pub_genre.reindex(top_10_publishers)
+                    
+                    # Aumentamos el tamaño para que los números del heatmap respiren
+                    fig_heatmap, ax_heat = plt.subplots(figsize=(10, 6.5)) 
+                    sns.heatmap(matriz_pub_genre, cmap="YlGnBu", annot=True, fmt=".1f", linewidths=.5, cbar_kws={'label': 'Ventas Globales (M USD)'}, ax=ax_heat)
+                    ax_heat.set_title("Top 10 Publishers e Ingresos por Género", fontsize=11, fontweight="bold", pad=10)
+                    ax_heat.set_xlabel("Género del Videojuego", fontsize=9, fontweight="semibold")
+                    ax_heat.set_ylabel("Publisher / Compañía", fontsize=9, fontweight="semibold")
+                    ax_heat.tick_params(axis='x', rotation=45, labelsize=9)
+                    ax_heat.tick_params(axis='y', labelsize=9)
+                    plt.tight_layout()
+                    st.pyplot(fig_heatmap)
+                    
+        with fila2_col2:
+            st.subheader("Cuota Relativa de Mercado (Top 10 Consolas)")
+            columnas_regiones = ['na_sales', 'pal_sales', 'jp_sales', 'total_sales']
+            if all(c in df_filtered.columns for c in columnas_regiones) and 'console' in df_filtered.columns:
+                df_platforms = df_filtered.groupby('console')[columnas_regiones].sum()
+                top_10_platforms = df_platforms.sort_values(by='total_sales', ascending=False).head(10)
+                top_10_porcentual = top_10_platforms[['na_sales', 'pal_sales', 'jp_sales']].copy()
+                suma_regiones = top_10_porcentual.sum(axis=1)
+                top_10_porcentual = top_10_porcentual.div(suma_regiones, axis=0) * 100
+                top_10_porcentual.columns = ['Norteamérica (NA)', 'Europa / PAL', 'Japón (JP)']
+                
+                fig_apilado, ax_apilado = plt.subplots(figsize=(10, 6.5))
+                top_10_porcentual.plot(kind='barh', stacked=True, color=['#3182bd', '#9ecae1', '#de2d26'], ax=ax_apilado, edgecolor='white', linewidth=1)
+                ax_apilado.set_xlabel("Porcentaje de Ventas (%)", fontsize=9)
+                ax_apilado.set_ylabel("Consola", fontsize=9)
+                ax_apilado.legend(title="Región", loc='lower left', fontsize=9)
+                
+                for patch_col in ax_apilado.containers:
+                    labels = [f'{val:.0f}%' if val > 8 else '' for val in patch_col.datavalues]
+                    ax_apilado.bar_label(patch_col, labels=labels, label_type='center', fontsize=8, fontweight='bold', color='white')
+                
+                plt.tight_layout()
+                st.pyplot(fig_apilado)
+    # Tab 4 Crítica y geaografia        
+    # TAB 4: FACTORES DE ÉXITO
     with tabs[3]:
         st.header("Factores de Éxito: El Peso de la Crítica y la Ubicación")
-        col1, col2 = st.columns(2)
-        with col1:
+        
+        # --- FILA 1: Críticas y Ventas Generales (2 Columnas) ---
+        fila1_col1, fila1_col2 = st.columns(2)
+        
+        with fila1_col1:
             st.subheader("¿Una buena crítica garantiza ventas masivas?")
             df_critics = df_filtered[df_filtered["critic_score"].notnull() & (df_filtered["critic_score"] > 0)] if not df_filtered.empty else pd.DataFrame()
             if not df_critics.empty:
-                fig5, ax5 = plt.subplots(figsize=(10, 5))
+                fig5, ax5 = plt.subplots(figsize=(10, 5.5))
                 sns.scatterplot(data=df_critics, x="critic_score", y="total_sales", alpha=0.4, color="teal", ax=ax5)
                 sns.regplot(data=df_critics, x="critic_score", y="total_sales", scatter=False, color="crimson", ax=ax5)
                 ax5.set_yscale("log")
+                ax5.set_xlabel("Puntuación de la Crítica (Critic Score)", fontsize=9)
+                ax5.set_ylabel("Ventas Globales (Log M USD)", fontsize=9)
                 st.pyplot(fig5)
             else:
                 st.info("No hay suficientes datos críticos de análisis en este rango.")
-        with col2:
+                
+        with fila1_col2:
             st.subheader("Segmentación Geográfica de los Ingresos")
             if not df_filtered.empty:
-                regiones = {"Norteamérica (NA)": df_filtered["na_sales"].sum(), "Europa / PAL": df_filtered["pal_sales"].sum(), "Japón (JP)": df_filtered["jp_sales"].sum(), "Otros Mercados": df_filtered["other_sales"].sum()}
+                regiones = {
+                    "Norteamérica (NA)": df_filtered["na_sales"].sum(), 
+                    "Europa / PAL": df_filtered["pal_sales"].sum(), 
+                    "Japón (JP)": df_filtered["jp_sales"].sum(), 
+                    "Otros Mercados": df_filtered["other_sales"].sum()
+                }
                 df_regiones = pd.DataFrame(list(regiones.items()), columns=["Region", "Ventas"])
-                fig6, ax6 = plt.subplots(figsize=(10, 5))
+                fig6, ax6 = plt.subplots(figsize=(10, 5.5))
                 sns.barplot(data=df_regiones, x="Region", y="Ventas", palette="autumn", hue="Region", legend=False, ax=ax6)
+                ax6.set_xlabel("Región", fontsize=9)
+                ax6.set_ylabel("Ventas Totales (M USD)", fontsize=9)
                 st.pyplot(fig6)
-
-    # TAB 5: ESTACIONALIDAD Y VENTANAS ESTRATÉGICAS (¡Integración completa de tu módulo de éxitos masivos!)
+                
+        st.markdown("---") 
+        
+        # --- FILA 2: Preferencia de Género por Región (1 Columna Completa) ---
+        st.subheader("Preferencia Regional por Género del Videojuego")
+        if not df_filtered.empty:
+            # Creamos una columna temporal de forma segura usando .loc para evitar alertas de copia
+            df_filtered = df_filtered.copy()
+            df_filtered['total_geo_sales'] = df_filtered["na_sales"].fillna(0) + df_filtered["pal_sales"].fillna(0) + df_filtered["jp_sales"].fillna(0)
+            
+            orden_generos = df_filtered.groupby("genre")["total_geo_sales"].sum().sort_values(ascending=False).index.tolist()
+            df_geo_genre = df_filtered.groupby("genre")[["na_sales", "pal_sales", "jp_sales"]].sum().reset_index()
+            df_geo_melted = df_geo_genre.melt(id_vars="genre", value_vars=["na_sales", "pal_sales", "jp_sales"], var_name="Region", value_name="Sales")
+            
+            mapa_regiones = {"na_sales": "Norteamérica (NA)", "pal_sales": "Europa / PAL", "jp_sales": "Japón (JP)"}
+            df_geo_melted["Region"] = df_geo_melted["Region"].map(mapa_regiones)
+            
+            # Al darle el ancho completo (12 de ancho), las barras de géneros se verán impecables
+            fig_geo, ax_geo = plt.subplots(figsize=(12, 5.5))
+            sns.barplot(data=df_geo_melted, x="genre", y="Sales", hue="Region", order=orden_generos, palette=["#4a90e2", "#50e3c2", "#ff5a5f"], ax=ax_geo)
+            
+            ax_geo.set_title("Distribución Geográfica de Ventas según el Género", fontsize=11, fontweight="bold", pad=12)
+            ax_geo.set_xlabel("Género del Videojuego", fontsize=9, fontweight="semibold")
+            ax_geo.set_ylabel("Ventas Acumuladas (Millones de USD)", fontsize=9, fontweight="semibold")
+            
+            # Rotación a 45 grados para que los nombres de los géneros no se pisen y se lean con naturalidad
+            plt.xticks(rotation=45, ha="right", fontsize=9)
+            plt.yticks(fontsize=9)
+            ax_geo.legend(title="Mercado Regional", title_fontsize='9', fontsize='8', loc="upper right")
+            
+            plt.tight_layout()
+            st.pyplot(fig_geo)
+    # TAB 5: ESTACIONALIDAD Y VENTANAS ESTRATÉGICAS 
     with tabs[4]:
         st.header("Análisis Táctico de Estacionalidad: El 'Timing' Perfecto")
         

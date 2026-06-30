@@ -20,7 +20,7 @@ sns.set_theme(style="whitegrid", palette="muted")
 plt.rcParams.update({'figure.max_open_warning': 0})
 
 # ----------------------------------------------------------------------------------
-# 1. FUNCIÓN DE CARGA Y LIMPIEZA DE DATOS (Pipeline Dinámico y Blindado)
+# 1. FUNCIÓN DE CARGA Y LIMPIEZA DE DATOS 
 # ----------------------------------------------------------------------------------
 @st.cache_data
 def load_and_clean_data(file_path="vgchartz-2024.csv"):
@@ -76,7 +76,7 @@ console_col = next((c for c in df.columns if 'console' in c or 'platform' in c),
 publisher_col = next((c for c in df.columns if 'pub' in c), 'publisher')
 
 # ----------------------------------------------------------------------------------
-# 2. BARRA LATERAL (Navegación limpia sin filtros a la izquierda)
+# 2. BARRA LATERAL 
 # ----------------------------------------------------------------------------------
 st.sidebar.title("Navegación")
 st.sidebar.markdown("---")
@@ -107,7 +107,7 @@ st.sidebar.info(
 # ==============================================================================
 
 # ------------------------------------------------------------------------------
-# MODO A: DASHBOARD GENERAL 
+# DASHBOARD GENERAL 
 # ------------------------------------------------------------------------------
 if app_mode == "dashboard":
     df_filtered = df.copy() # El dashboard opera sobre el histórico global completo
@@ -417,7 +417,7 @@ if app_mode == "dashboard":
             st.info("Sin registros de fecha válidos para calcular estacionalidad.")
 
 # ------------------------------------------------------------------------------
-# MODO B: SECCIÓN COMBINADA CON FILTROS INTEGRADOS EN LA PROPIA PÁGINA
+# MODO B: 
 # ------------------------------------------------------------------------------
 elif app_mode == "search_and_catalog":
     st.title("🔍 Explorador Avanzado de Videojuegos")

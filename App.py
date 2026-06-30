@@ -7,7 +7,7 @@ import datetime
 
 # Configuración de página de Streamlit
 st.set_page_config(
-    page_title="Video Game Market Insights | Dashboard Ejecutivo",
+    page_title="Video Game Market | Dashboard Ejecutivo",
     page_icon="🎮",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -73,16 +73,16 @@ df = load_and_clean_data()
 # ----------------------------------------------------------------------------------
 # 2. BARRA LATERAL (Filtros Globales e Información del Portafolio)
 # ----------------------------------------------------------------------------------
-st.sidebar.title("🎯 Navegación y Filtros")
+st.sidebar.title("Navegación y Filtros")
 st.sidebar.markdown("---")
 
 # Selector de Modo de Visualización
 app_mode = st.sidebar.radio(
     "Selecciona la sección:",
-    ["📊 Dashboard de Storytelling", "📝 Documentación Técnica"]
+    ["Dashboard", "Documentación Técnica"]
 )
 
-if app_mode == "📊 Dashboard de Storytelling":
+if app_mode == "Dashboard":
     st.sidebar.subheader("Filtros Globales")
     
     # Filtro de Años
@@ -115,17 +115,17 @@ else:
 st.sidebar.markdown("---")
 st.sidebar.info(
     "**Científico de Datos:** Álvaro Domingo Cordón\n\n"
-    "[💼 LinkedIn](https://linkedin.com)\n"
-    "[🐙 GitHub](https://github.com)"
+    "[LinkedIn](http://www.linkedin.com/in/alvaro-domingo)\n"
+    "[GitHub](https://github.com/alvarodc093-pixel)"
 )
 
 # ----------------------------------------------------------------------------------
 # 3. SECCIÓN: DASHBOARD DE STORYTELLING (Estructura de 15 Minutos)
 # ----------------------------------------------------------------------------------
-if app_mode == "📊 Dashboard de Storytelling":
+if app_mode == "Dashboard":
     
     # Encabezado Principal
-    st.title("🎮 Video Game Market Insights")
+    st.title("🎮 Video Game Market")
     st.subheader("Transformando Datos de VGChartz en Estrategia Comercial de Lanzamientos")
     st.markdown("---")
     
@@ -160,7 +160,7 @@ if app_mode == "📊 Dashboard de Storytelling":
             """)
         
         with col2:
-            st.markdown("### Resumen del Data Pipeline")
+            st.markdown("### Resumen")
             st.metric(label="Registros Brutos Recibidos", value=f"{df_raw_len:,}")
             st.metric(label="Registros Válidos con Ventas (>0)", value=f"{len(df):,}")
             st.error(f"Filas Removidas por Inconsistencia: {df_raw_len - len(df):,}")

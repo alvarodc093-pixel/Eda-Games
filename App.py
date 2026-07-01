@@ -84,7 +84,7 @@ st.sidebar.markdown("---")
 # Mapeo seguro de secciones internas
 SECCIONES_MAP = {
     "Dashboard General": "dashboard",
-    "Buscador & Catálogo por Publisher": "search_and_catalog",
+    "Buscador": "search_and_catalog",
     "Títulos Líderes en el Mercado": "market_leaders",
     "Documentación Técnica": "docs"
 }
@@ -97,7 +97,7 @@ app_mode = SECCIONES_MAP[seccion_seleccionada]
 
 st.sidebar.markdown("---")
 st.sidebar.info(
-    "**Científico de Datos:** Álvaro Domingo Cordón\n\n"
+    "**Analista de Datos:** Álvaro Domingo Cordón\n\n"
     "[LinkedIn](http://www.linkedin.com/in/alvaro-domingo) | [GitHub](https://github.com/alvarodc093-pixel)"
 )
 
@@ -159,7 +159,7 @@ if app_mode == "dashboard":
             * **5. Estacionalidad Táctica:** Descubrimiento del momento exacto del año para lanzar según la eficiencia por título.
             """)
         with col_der:
-            st.markdown("### Ficha Técnica del Pipeline de Ingeniería de Datos")
+            st.markdown("### Ficha Técnica")
             with st.expander("Ver Procesamiento y Saneamiento ETL", expanded=True):
                 st.markdown("""
                 * **Filtrado Anti-Sesgo:** Eliminación de registros con facturación en cero o nula para proteger las medias financieras de distorsiones por software gratuito o descatalogado.

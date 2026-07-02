@@ -356,7 +356,40 @@ if app_mode == "dashboard":
                 conteo_q = df_blockbusters["quarter"].value_counts().reindex(orden_trimestres)
                 axes_hits[1].pie(conteo_q, labels=conteo_q.index, autopct='%1.1f%%', startangle=90, colors=["#9dc6e0", "#a1dab4", "#feb24c", "#f03b20"], textprops={'fontsize': 12, 'fontweight': 'bold'}, wedgeprops={'edgecolor': 'white', 'linewidth': 2})
                 st.pyplot(fig_hits)
+    st.markdown("---") # Línea divisoria visual
 
+    st.subheader("🏆 Muestra de Control: Top 5 Líderes Históricos del Segmento Élite")
+        
+    if not df_filtered.empty:
+            df_control = df_filtered.copy()
+           
+            if 'month_es' not in df_control.columns and 'release_date' in df_control.columns:
+                df_control['release_date'] = pd.to_datetime(df_control['release_date'], errors='coerce')
+                meses_map = {
+                    1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 
+                    5: "Mayo", 6: "Junio", 7: "Julio", 8: "Agosto", 
+                    9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+                }
+                df_control['month_es'] = df_control['release_date'].dt.month.map(meses_map)
+            
+            df_control = df_control.sort_values(by="total_sales", ascending=False)
+            
+            columnas_mostrar = ["title", "console", "year", "total_sales", "month_es"]
+            columnas_validas = [c for c in columnas_mostrar if c in df_control.columns]
+            
+            # 5. Extraemos el Top 5 definitivo
+            df_elite_top5 = df_control.head(5)[columnas_validas]
+            
+            if not df_elite_top5.empty:
+  
+                df_elite_top5 = df_elite_top5.reset_index(drop=True)
+                st.dataframe(df_elite_top5, use_container_width=True)
+                
+                st.caption("*Nota:* Compruebe que los meses coinciden con los picos del Q4 (Septiembre, Octubre, Noviembre).")
+            else:
+                st.warning("No se pudieron formatear las columnas de la muestra de control.")
+    else:
+                st.info("Filtre los datos para visualizar la muestra de control histórica.")
 # ------------------------------------------------------------------------------
 # MODO B: SECCIÓN COMBINADA CON FILTROS INTEGRADOS 
 # ------------------------------------------------------------------------------
@@ -482,3 +515,6 @@ elif app_mode == "market_leaders":
 elif app_mode == "docs":
     st.title("Arquitectura del Proyecto & Ficha Técnica")
     st.dataframe(df.head(20))
+    df_filtered = df.copy()
+
+  

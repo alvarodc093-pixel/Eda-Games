@@ -51,11 +51,14 @@ def load_and_clean_data(file_path="vgchartz-2024.csv"):
     df['genre'] = df['genre'].fillna('Unknown')
     df['console'] = df['console'].fillna('Unknown')
     
-    # Rellenamos las ventas vacías con 0 de forma preventiva
+    # Rellenamos las ventas vacías con 0 en lugar de borrarlas para que el PC no desaparezca del catálogo por culpa del formato digital
     df['total_sales'] = df['total_sales'].fillna(0)
     for col_reg in ['na_sales', 'pal_sales', 'jp_sales', 'other_sales']:
         if col_reg in df.columns:
             df[col_reg] = df[col_reg].fillna(0)
+            
+    # Conservamos registros con ventas > 0 O que pertenezcan explícitamente a la plataforma PC
+    df = df[(df['total_sales'] > 0) | (df['console'].str.lower().str.strip() == 'pc')]
 
     # Convertimos fecha y aseguramos la existencia de la columna 'year' ANTES de filtrar
     if 'release_date' in df.columns:
@@ -183,37 +186,22 @@ if app_mode == "dashboard":
         with col2:
             st.subheader("Top 15 Plataformas con Mayor Catálogo")
             if not df_filtered.empty:
-           
-                df_grafico = df_filtered[
-                    (df_filtered["total_sales"] > 0) | 
-                    ((df_filtered["console"].str.lower().str.strip() == "pc") & (df_filtered["critic_score"] > 0))
-                ].copy()                           
-                conteo_consolas = df_filtered["console"].value_counts()
-                if "PC" in conteo_consolas and conteo_consolas["PC"] > 3000:
-                  
-                    df_grafico = df_filtered[df_filtered["total_sales"] > 0].copy()
-                else:
-                    df_grafico = df_filtered.copy()
-                
                 fig_univ, ax_univ = plt.subplots(figsize=(10, 5))
-                order_consoles = df_grafico["console"].value_counts().head(15).index
-                
+                order_consoles = df_filtered["console"].value_counts().head(15).index
                 sns.countplot(
-                    data=df_grafico, 
+                    data=df_filtered,
                     x="console", 
                     order=order_consoles, 
                     palette="crest", 
                     hue="console", 
                     legend=False,
                     ax=ax_univ
-                )
-                
+                )     
                 ax_univ.set_title("Análisis Univariante: Top 15 Plataformas con Mayor Catálogo de Juegos", fontsize=11, fontweight="bold", pad=10)
                 ax_univ.set_xlabel("Consola / Plataforma", fontsize=10)
                 ax_univ.set_ylabel("Cantidad de Títulos Registrados", fontsize=10)
                 ax_univ.tick_params(axis='x', rotation=45)
-                
-                st.pyplot(fig_univ)
+                st.pyplot(fig_univ) 
         with col3:
             st.subheader("La Realidad del Éxito Comercial (Sesgo Exponencial)")
             fig2, ax2 = plt.subplots(figsize=(10, 5))
@@ -356,7 +344,6 @@ if app_mode == "dashboard":
                 conteo_q = df_blockbusters["quarter"].value_counts().reindex(orden_trimestres)
                 axes_hits[1].pie(conteo_q, labels=conteo_q.index, autopct='%1.1f%%', startangle=90, colors=["#9dc6e0", "#a1dab4", "#feb24c", "#f03b20"], textprops={'fontsize': 12, 'fontweight': 'bold'}, wedgeprops={'edgecolor': 'white', 'linewidth': 2})
                 st.pyplot(fig_hits)
-    st.markdown("---") # Línea divisoria visual
 
     st.subheader("🏆 Muestra de Control: Top 5 Líderes Históricos del Segmento Élite")
         
@@ -515,6 +502,3 @@ elif app_mode == "market_leaders":
 elif app_mode == "docs":
     st.title("Arquitectura del Proyecto & Ficha Técnica")
     st.dataframe(df.head(20))
-    df_filtered = df.copy()
-
-  

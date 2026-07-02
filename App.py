@@ -250,7 +250,7 @@ if app_mode == "dashboard":
                 sns.barplot(data=ventas_genero, x="total_sales", y="genre", palette="viridis", hue="genre", legend=False, ax=ax4)
                 st.pyplot(fig4)
         # --- FILA 2: Heatmap y Distribución Regional (2 columnas) ---
-        fila2_col1, = st.columns(1)
+        fila2_col1, fila2_col2 = st.columns(2)
         
         with fila2_col1:
             st.subheader("Matriz Estratégica: Top 10 Publishers")
@@ -299,7 +299,7 @@ if app_mode == "dashboard":
         st.markdown("---")
         
         st.subheader("2. Patrones de Consumo Geográfico e Identidad Cultural")
-        col_g1, col_g2 = st.columns(2)
+        col_g1, col_g2, col_g3 = st.columns(3)
         
         with col_g1:
             st.markdown("##### Volumen Absoluto de Ingresos por Región")
@@ -339,7 +339,123 @@ if app_mode == "dashboard":
                 if not top_10_porcentual.empty:
                     consola_mas_jp = top_10_porcentual['Japón (JP)'].idxmax()
                     st.info(f"💡 **Insight Territorial:** La consola **{consola_mas_jp.upper()}** registra la mayor tasa de tracción nativa en el mercado asiático, mientras que plataformas de marcas americanas centralizan más del 60% de su rendimiento en la región de Norteamérica.")
+        st.markdown("### Análisis Complementario")
 
+        col_g3, col_g4, col_g5 = st.columns(3)
+
+        with col_g3:
+
+            st.markdown("##### Preferencias Regionales por Género")
+
+            if all(col in df_filtered.columns for col in ["genre", "na_sales", "pal_sales", "jp_sales"]):
+
+                df_geo_genre = (
+                    df_filtered
+                    .groupby("genre")[["na_sales", "pal_sales", "jp_sales"]]
+                    .sum()
+                )
+
+                df_geo_genre["total_global"] = df_geo_genre.sum(axis=1)
+
+                df_geo_genre = (
+                    df_geo_genre
+                    .sort_values("total_global", ascending=False)
+                    .drop(columns="total_global")
+                )
+
+                df_geo_melted = (
+                    df_geo_genre
+                    .reset_index()
+                    .melt(
+                        id_vars="genre",
+                        var_name="Region",
+                        value_name="Sales"
+                    )
+                )
+
+                mapa_regiones = {
+                    "na_sales": "NA",
+                    "pal_sales": "PAL",
+                    "jp_sales": "JP"
+                }
+
+                df_geo_melted["Region"] = (
+                    df_geo_melted["Region"]
+                    .map(mapa_regiones)
+                )
+
+                fig_genre, ax_genre = plt.subplots(figsize=(7, 5))
+
+                sns.barplot(
+                    data=df_geo_melted,
+                    x="genre",
+                    y="Sales",
+                    hue="Region",
+                    palette=["#3182bd", "#9ecae1", "#de2d26"],
+                    ax=ax_genre
+                )
+
+                ax_genre.set_xlabel("")
+                ax_genre.set_ylabel("Ventas")
+                ax_genre.tick_params(axis="x", rotation=45)
+                ax_genre.legend(title="")
+
+                plt.tight_layout()
+
+                st.pyplot(fig_genre, use_container_width=True)
+
+        with col_g4:
+
+            st.markdown("##### Interpretación Estratégica")
+
+            genero_jp = (
+                df_filtered.groupby("genre")["jp_sales"]
+                .sum()
+                .idxmax()
+            )
+
+            genero_na = (
+                df_filtered.groupby("genre")["na_sales"]
+                .sum()
+                .idxmax()
+            )
+
+            genero_pal = (
+                df_filtered.groupby("genre")["pal_sales"]
+                .sum()
+                .idxmax()
+            )
+
+            st.metric(
+                "Género líder en Japón",
+                genero_jp
+            )
+
+            st.metric(
+                "Género líder en Norteamérica",
+                genero_na
+            )
+
+            st.metric(
+                "Género líder en Europa",
+                genero_pal
+            )
+
+            st.info(
+                f"""
+                🎮 Los patrones de consumo muestran una clara
+                especialización regional.
+
+                • Japón favorece principalmente **{genero_jp}**.
+
+                • Norteamérica concentra más ventas en **{genero_na}**.
+
+                • Europa presenta mayor afinidad por **{genero_pal}**.
+
+                Estas diferencias reflejan factores culturales,
+                históricos y de penetración de plataformas.
+                """
+            )
     # TAB 5: ESTACIONALIDAD
     with tabs[4]:
         st.header("Análisis Táctico de Estacionalidad: El 'Timing' Perfecto")

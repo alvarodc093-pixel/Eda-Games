@@ -249,7 +249,31 @@ if app_mode == "dashboard":
                 fig4, ax4 = plt.subplots(figsize=(10, 5))
                 sns.barplot(data=ventas_genero, x="total_sales", y="genre", palette="viridis", hue="genre", legend=False, ax=ax4)
                 st.pyplot(fig4)
+        # --- FILA 2: Heatmap y Distribución Regional (2 columnas) ---
+        fila2_col1, = st.columns(1)
+        
+        with fila2_col1:
+            st.subheader("Matriz Estratégica: Top 10 Publishers")
+            if not df_filtered.empty:
+                top_10_publishers = df_filtered.groupby(publisher_col)["total_sales"].sum().nlargest(10).index
+                df_top_pub = df_filtered[df_filtered[publisher_col].isin(top_10_publishers)]
 
+                if not df_top_pub.empty:
+                    matriz_pub_genre = df_top_pub.pivot_table(index=publisher_col, columns="genre", values="total_sales", aggfunc="sum").fillna(0)
+                    matriz_pub_genre = matriz_pub_genre.reindex(top_10_publishers)
+                    
+                    # Aumentamos el tamaño para que los números del heatmap respiren
+                    fig_heatmap, ax_heat = plt.subplots(figsize=(10, 6.5)) 
+                    sns.heatmap(matriz_pub_genre, cmap="YlGnBu", annot=True, fmt=".1f", linewidths=.5, cbar_kws={'label': 'Ventas Globales (M USD)'}, ax=ax_heat)
+                    ax_heat.set_title("Top 10 Publishers e Ingresos por Género", fontsize=11, fontweight="bold", pad=10)
+                    ax_heat.set_xlabel("Género del Videojuego", fontsize=9, fontweight="semibold")
+                    ax_heat.set_ylabel("Publisher / Compañía", fontsize=9, fontweight="semibold")
+                    ax_heat.tick_params(axis='x', rotation=45, labelsize=9)
+                    ax_heat.tick_params(axis='y', labelsize=9)
+                    plt.tight_layout()
+                    st.pyplot(fig_heatmap)
+                    
+      
     # TAB 4: CRÍTICA Y GEOGRAFÍA (Con el gráfico de consumo relativo regional adaptado)
     with tabs[3]:
         st.header("Factores de Éxito: El Peso de la Crítica y la Ubicación Geográfica")

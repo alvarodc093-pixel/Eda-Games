@@ -372,7 +372,6 @@ if app_mode == "dashboard":
                 df_elite_top5 = df_elite_top5.reset_index(drop=True)
                 st.dataframe(df_elite_top5, use_container_width=True)
                 
-                st.caption("*Nota:* Compruebe que los meses coinciden con los picos del Q4 (Septiembre, Octubre, Noviembre).")
             else:
                 st.warning("No se pudieron formatear las columnas de la muestra de control.")
     else:
